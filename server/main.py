@@ -100,20 +100,25 @@ def debug():
 
 
 @app.post("/api/encode")
-def encode(cover: UploadFile = File(...), secret: UploadFile = File(...), alpha: float = Form(0.1)):
+async def encode(cover: UploadFile = File(...), secret: UploadFile = File(...), alpha: float = Form(0.1)):
     """Encode secret into cover"""
     try:
+        print(f"Encode request: cover={cover.filename}, secret={secret.filename}, alpha={alpha}")
+        
         if not (0 < alpha <= 1):
             return Response(content=b"Invalid alpha", status_code=400)
         
         cover_img = _load_rgb(cover)
         secret_img = _load_rgb(secret)
+        print(f"Images loaded: cover={cover_img.size}, secret={secret_img.size}")
+        
         cover_img, secret_img = _resize_match(cover_img, secret_img)
         
         cover_arr = _to_float_array(cover_img)
         secret_arr = _to_float_array(secret_img)
         
         stego_arr = encode_stegano(cover_arr, secret_arr, alpha)
+        print(f"Encoding successful")
         
         return Response(content=_array_to_png_bytes(stego_arr), media_type="image/png")
     except Exception as e:

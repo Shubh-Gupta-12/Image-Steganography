@@ -68,7 +68,8 @@ function AppLayout() {
       });
 
       if (!encodeResponse.ok) {
-        throw new Error("Encode failed.");
+        const errorText = await encodeResponse.text();
+        throw new Error(`Encode failed: ${errorText || encodeResponse.status}`);
       }
 
       const stegoBlob = await encodeResponse.blob();
