@@ -10,5 +10,3 @@ services:
         value: "600"
       - key: HF_HUB_ETAG_TIMEOUT
         value: "600"
-      - key: VITE_API_BASE
-        value: /api
