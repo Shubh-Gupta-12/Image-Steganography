@@ -85,6 +85,20 @@ def health():
     return {"status": "ok", "mode": "lightweight"}
 
 
+@app.get("/api/debug")
+def debug():
+    """Debug info for troubleshooting"""
+    static_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "static")
+    alt_paths = ["/app/server/static", "/app/static", "./static"]
+    found_paths = {p: os.path.isdir(p) for p in [static_dir] + alt_paths}
+    return {
+        "cwd": os.getcwd(),
+        "file_location": __file__,
+        "static_dir_computed": static_dir,
+        "paths_checked": found_paths
+    }
+
+
 @app.post("/api/encode")
 def encode(cover: UploadFile = File(...), secret: UploadFile = File(...), alpha: float = Form(0.1)):
     """Encode secret into cover"""
@@ -135,7 +149,25 @@ def decode(cover: UploadFile = File(...), stego: UploadFile = File(...), alpha: 
 
 
 # Serve frontend static files if available
-static_dir = os.path.join(os.path.dirname(__file__), "static")
+static_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "static")
+print(f"Looking for static files in: {static_dir}")
+print(f"Static dir exists: {os.path.isdir(static_dir)}")
+
 if os.path.isdir(static_dir):
+    # List files for debugging
+    try:
+        files = os.listdir(static_dir)
+        print(f"Static files found: {files[:10]}")
+    except Exception as e:
+        print(f"Error listing static dir: {e}")
     app.mount("/", StaticFiles(directory=static_dir, html=True), name="static")
+else:
+    print("WARNING: Static directory not found, frontend will not be served")
+    # Try alternative paths
+    alt_paths = ["/app/server/static", "/app/static", "./static"]
+    for alt in alt_paths:
+        if os.path.isdir(alt):
+            print(f"Found static at alternative path: {alt}")
+            app.mount("/", StaticFiles(directory=alt, html=True), name="static")
+            break
 
