@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: image-stego
+    env: docker
+    plan: free
+    dockerfilePath: server/Dockerfile.render
+    autoDeploy: true
+    envVars:
+      - key: HF_HUB_DOWNLOAD_TIMEOUT
+        value: "600"
+      - key: HF_HUB_ETAG_TIMEOUT
+        value: "600"
+      - key: VITE_API_BASE
+        value: /api

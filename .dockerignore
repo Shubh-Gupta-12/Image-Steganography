@@ -1,0 +1,12 @@
+node_modules
+.venv
+__pycache__
+Flicker8K Dataset
+*.pth
+*.pt
+*.bin
+*.png
+*.jpg
+*.webp
+.vscode
+.git

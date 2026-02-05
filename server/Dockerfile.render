@@ -1,0 +1,28 @@
+FROM node:20-alpine AS frontend
+
+WORKDIR /app
+
+COPY package.json package-lock.json ./
+RUN npm ci
+
+ARG VITE_API_BASE
+ENV VITE_API_BASE=${VITE_API_BASE}
+
+COPY src ./src
+COPY public ./public
+COPY index.html vite.config.js ./
+
+RUN npm run build
+
+FROM python:3.11-slim
+
+WORKDIR /app
+
+COPY server/requirements.txt /app/server/requirements.txt
+RUN pip install --no-cache-dir -r /app/server/requirements.txt
+
+COPY server /app/server
+COPY --from=frontend /app/dist /app/server/static
+
+EXPOSE 8000
+CMD ["uvicorn", "server.main:app", "--host", "0.0.0.0", "--port", "8000"]
