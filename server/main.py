@@ -24,10 +24,9 @@ app.add_middleware(
 print("🚀 ImageStego API starting (lightweight mode)")
 
 
-def _load_rgb(upload: UploadFile) -> Image.Image:
+async def _load_rgb(upload: UploadFile) -> Image.Image:
     """Load image from upload"""
-    image_bytes = upload.file.read()
-    upload.file.seek(0)
+    image_bytes = await upload.read()
     return Image.open(io.BytesIO(image_bytes)).convert("RGB")
 
 
@@ -108,8 +107,8 @@ async def encode(cover: UploadFile = File(...), secret: UploadFile = File(...), 
         if not (0 < alpha <= 1):
             return Response(content=b"Invalid alpha", status_code=400)
         
-        cover_img = _load_rgb(cover)
-        secret_img = _load_rgb(secret)
+        cover_img = await _load_rgb(cover)
+        secret_img = await _load_rgb(secret)
         print(f"Images loaded: cover={cover_img.size}, secret={secret_img.size}")
         
         cover_img, secret_img = _resize_match(cover_img, secret_img)
@@ -129,14 +128,14 @@ async def encode(cover: UploadFile = File(...), secret: UploadFile = File(...), 
 
 
 @app.post("/api/decode")
-def decode(cover: UploadFile = File(...), stego: UploadFile = File(...), alpha: float = Form(0.1)):
+async def decode(cover: UploadFile = File(...), stego: UploadFile = File(...), alpha: float = Form(0.1)):
     """Decode secret from stego"""
     try:
         if not (0 < alpha <= 1):
             return Response(content=b"Invalid alpha", status_code=400)
         
-        cover_img = _load_rgb(cover)
-        stego_img = _load_rgb(stego)
+        cover_img = await _load_rgb(cover)
+        stego_img = await _load_rgb(stego)
         cover_img, stego_img = _resize_match(cover_img, stego_img)
         
         cover_arr = _to_float_array(cover_img)
