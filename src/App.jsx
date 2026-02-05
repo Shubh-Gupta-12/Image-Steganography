@@ -19,7 +19,8 @@ function AppLayout() {
   const [status, setStatus] = useState("Upload a cover image and a secret image to proceed.");
   const [loading, setLoading] = useState(false);
 
-  const API_BASE = import.meta.env.VITE_API_BASE || (import.meta.env.DEV ? "http://localhost:8000" : "");
+  // In production, API is on same origin at /api. In dev, use localhost:8000
+  const API_BASE = import.meta.env.DEV ? "http://localhost:8000" : "";
 
   // Initialize Theme
   useEffect(() => {
