@@ -171,11 +171,9 @@ function AppLayout() {
             <NavLink to="/results" className={({ isActive }) => (isActive ? "nav-link active" : "nav-link")}>
               Results
             </NavLink>
-            <NavLink to="/about" className={({ isActive }) => (isActive ? "nav-link active" : "nav-link")}>
-              About
-            </NavLink>
           </nav>
           <div className="nav-actions">
+            <NavLink to="/about" className={({ isActive }) => isActive ? "nav-btn nav-btn-ghost active" : "nav-btn nav-btn-ghost"}>About</NavLink>
             <NavLink to="/contact" className={({ isActive }) => isActive ? "nav-btn nav-btn-ghost active" : "nav-btn nav-btn-ghost"}>Contact</NavLink>
             {user ? (
               <>
