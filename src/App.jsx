@@ -8,6 +8,7 @@ import AboutPage from "./pages/AboutPage";
 import ContactPage from "./pages/ContactPage";
 import LoginPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage";
+import HistoryPage from "./pages/HistoryPage";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import { supabase, STORAGE_BUCKET } from "./lib/supabase";
 
@@ -142,6 +143,11 @@ function AppLayout() {
       const decodedBlob = await decodeResponse.blob();
       setDecodedImage(URL.createObjectURL(decodedBlob));
 
+      // Save decoded image to storage if user is logged in
+      if (user) {
+        await saveImageToStorage(decodedBlob, 'decoded');
+      }
+
       setStatus("Done!");
       navigate("/results");
     } catch (error) {
@@ -173,6 +179,7 @@ function AppLayout() {
             <NavLink to="/contact" className={({ isActive }) => isActive ? "nav-btn nav-btn-ghost active" : "nav-btn nav-btn-ghost"}>Contact</NavLink>
             {user ? (
               <>
+                <NavLink to="/history" className={({ isActive }) => isActive ? "nav-btn nav-btn-ghost active" : "nav-btn nav-btn-ghost"}>My Images</NavLink>
                 <span className="user-email">{user.email?.split('@')[0]}</span>
                 <button className="nav-btn nav-btn-ghost" type="button" onClick={handleSignOut}>Logout</button>
               </>
@@ -218,6 +225,7 @@ function AppLayout() {
         <Route path="/contact" element={<ContactPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
+        <Route path="/history" element={<HistoryPage />} />
       </Routes>
 
       <footer className="footer">
