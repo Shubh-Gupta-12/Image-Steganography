@@ -43,30 +43,7 @@ export default function ContactPage() {
           </span>
         </h2>
         <p>
-          Have questions about Stegora? Check out our frequently asked questions below 
-          or reach out to the development team.
-        </p>
-      </section>
-
-      <section className="contact-info" style={{
-        background: 'var(--card-bg)',
-        borderRadius: '16px',
-        padding: '2rem',
-        marginBottom: '2rem',
-        textAlign: 'center'
-      }}>
-        <div style={{ marginBottom: '1rem' }}>
-          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-            <circle cx="9" cy="7" r="4"></circle>
-            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-          </svg>
-        </div>
-        <h3 style={{ color: 'var(--text-main)', marginBottom: '0.5rem' }}>Group Project</h3>
-        <p style={{ color: 'var(--text-muted)' }}>
-          Stegora is developed as an academic group project exploring image steganography 
-          techniques using modern web technologies and machine learning.
+          Have questions about Stegora? Check out our frequently asked questions below.
         </p>
       </section>
 
