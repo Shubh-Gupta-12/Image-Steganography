@@ -6,10 +6,14 @@ import HomePage from "./pages/HomePage";
 import ResultsPage from "./pages/ResultsPage";
 import AboutPage from "./pages/AboutPage";
 import ContactPage from "./pages/ContactPage";
+import LoginPage from "./pages/LoginPage";
+import SignupPage from "./pages/SignupPage";
+import { AuthProvider, useAuth } from "./context/AuthContext";
+import { supabase, STORAGE_BUCKET } from "./lib/supabase";
 
 function AppLayout() {
   const navigate = useNavigate();
-  // Theme fixed to light mode
+  const { user, signOut } = useAuth();
   
   // State for Processing
   const [coverImage, setCoverImage] = useState(null);
@@ -28,6 +32,42 @@ function AppLayout() {
     document.documentElement.setAttribute("data-theme", "light");
     localStorage.removeItem("theme");
   }, []);
+
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+      navigate('/');
+    } catch (err) {
+      console.error('Sign out error:', err);
+    }
+  };
+
+  // Save image to Supabase storage
+  const saveImageToStorage = async (blob, type) => {
+    if (!user) return null;
+    
+    const timestamp = Date.now();
+    const fileName = `${user.id}/${type}_${timestamp}.png`;
+    
+    const { data, error } = await supabase.storage
+      .from(STORAGE_BUCKET)
+      .upload(fileName, blob, {
+        contentType: 'image/png',
+        upsert: false
+      });
+    
+    if (error) {
+      console.error('Storage upload error:', error);
+      return null;
+    }
+    
+    // Get public URL
+    const { data: urlData } = supabase.storage
+      .from(STORAGE_BUCKET)
+      .getPublicUrl(fileName);
+    
+    return urlData?.publicUrl || null;
+  };
 
   const handleImageChange = (type) => (e) => {
     const file = e.target.files?.[0];
@@ -77,6 +117,12 @@ function AppLayout() {
       const stegoBlob = await encodeResponse.blob();
       setStegoImage(URL.createObjectURL(stegoBlob));
 
+      // Save stego image to storage if user is logged in
+      if (user) {
+        setStatus("Saving to your account...");
+        await saveImageToStorage(stegoBlob, 'stego');
+      }
+
       setStatus("Decoding...");
 
       const decodeForm = new FormData();
@@ -125,8 +171,17 @@ function AppLayout() {
           </nav>
           <div className="nav-actions">
             <NavLink to="/contact" className={({ isActive }) => isActive ? "nav-btn nav-btn-ghost active" : "nav-btn nav-btn-ghost"}>Contact</NavLink>
-            <button className="nav-btn nav-btn-ghost" type="button">Login</button>
-            <button className="nav-btn nav-btn-solid" type="button">Sign Up</button>
+            {user ? (
+              <>
+                <span className="user-email">{user.email?.split('@')[0]}</span>
+                <button className="nav-btn nav-btn-ghost" type="button" onClick={handleSignOut}>Logout</button>
+              </>
+            ) : (
+              <>
+                <NavLink to="/login" className={({ isActive }) => isActive ? "nav-btn nav-btn-ghost active" : "nav-btn nav-btn-ghost"}>Login</NavLink>
+                <NavLink to="/signup" className="nav-btn nav-btn-solid">Sign Up</NavLink>
+              </>
+            )}
           </div>
           
         </div>
@@ -161,6 +216,8 @@ function AppLayout() {
         />
         <Route path="/about" element={<AboutPage />} />
         <Route path="/contact" element={<ContactPage />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/signup" element={<SignupPage />} />
       </Routes>
 
       <footer className="footer">
@@ -173,7 +230,9 @@ function AppLayout() {
 function App() {
   return (
     <BrowserRouter>
-      <AppLayout />
+      <AuthProvider>
+        <AppLayout />
+      </AuthProvider>
     </BrowserRouter>
   );
 }
