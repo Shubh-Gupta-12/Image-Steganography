@@ -5,6 +5,7 @@ import "./App.css";
 import HomePage from "./pages/HomePage";
 import ResultsPage from "./pages/ResultsPage";
 import AboutPage from "./pages/AboutPage";
+import ContactPage from "./pages/ContactPage";
 
 function AppLayout() {
   const navigate = useNavigate();
@@ -123,7 +124,7 @@ function AppLayout() {
             </NavLink>
           </nav>
           <div className="nav-actions">
-            <button className="nav-btn nav-btn-ghost" type="button">Contact</button>
+            <NavLink to="/contact" className={({ isActive }) => isActive ? "nav-btn nav-btn-ghost active" : "nav-btn nav-btn-ghost"}>Contact</NavLink>
             <button className="nav-btn nav-btn-ghost" type="button">Login</button>
             <button className="nav-btn nav-btn-solid" type="button">Sign Up</button>
           </div>
@@ -159,6 +160,7 @@ function AppLayout() {
           }
         />
         <Route path="/about" element={<AboutPage />} />
+        <Route path="/contact" element={<ContactPage />} />
       </Routes>
 
       <footer className="footer">
