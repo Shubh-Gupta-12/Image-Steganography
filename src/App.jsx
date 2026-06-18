@@ -15,7 +15,7 @@ import { supabase, STORAGE_BUCKET } from "./lib/supabase";
 function AppLayout() {
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
-  
+
   // State for Processing
   const [coverImage, setCoverImage] = useState(null);
   const [secretImage, setSecretImage] = useState(null);
@@ -26,8 +26,11 @@ function AppLayout() {
   const [loading, setLoading] = useState(false);
 
   // In production, API is on same origin at /api. In dev, use localhost:8000
-  const API_BASE = import.meta.env.DEV ? "http://localhost:8000" : "";
-
+  // const API_BASE = import.meta.env.VITE_API_BASE;
+  const API_BASE = "https://dodgy-keg-grove.ngrok-free.dev";
+  console.log("API_BASE =", API_BASE);
+  console.log(import.meta.env);
+  console.log("ENV =", import.meta.env);
   // Initialize Theme
   useEffect(() => {
     document.documentElement.setAttribute("data-theme", "light");
@@ -46,27 +49,27 @@ function AppLayout() {
   // Save image to Supabase storage
   const saveImageToStorage = async (blob, type) => {
     if (!user) return null;
-    
+
     const timestamp = Date.now();
     const fileName = `${user.id}/${type}_${timestamp}.png`;
-    
+
     const { data, error } = await supabase.storage
       .from(STORAGE_BUCKET)
       .upload(fileName, blob, {
         contentType: 'image/png',
         upsert: false
       });
-    
+
     if (error) {
       console.error('Storage upload error:', error);
       return null;
     }
-    
+
     // Get public URL
     const { data: urlData } = supabase.storage
       .from(STORAGE_BUCKET)
       .getPublicUrl(fileName);
-    
+
     return urlData?.publicUrl || null;
   };
 
@@ -79,7 +82,7 @@ function AppLayout() {
     } else {
       setSecretImage(file);
     }
-    
+
     // Determine the status based on update
     const hasCover = type === "cover" ? file : coverImage;
     const hasSecret = type === "secret" ? file : secretImage;
@@ -188,7 +191,7 @@ function AppLayout() {
               </>
             )}
           </div>
-          
+
         </div>
       </header>
 
