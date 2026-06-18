@@ -27,8 +27,7 @@ function AppLayout() {
 
   // In production, API is on same origin at /api. In dev, use localhost:8000
   // const API_BASE = import.meta.env.VITE_API_BASE;
-  const API_BASE = "https://dodgy-keg-grove.ngrok-free.dev";
-  console.log("API_BASE =", API_BASE);
+const API_BASE = import.meta.env.VITE_API_BASE;  console.log("API_BASE =", API_BASE);
   console.log(import.meta.env);
   console.log("ENV =", import.meta.env);
   // Initialize Theme
